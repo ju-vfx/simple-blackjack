@@ -1,12 +1,14 @@
 from deck.deck import Deck
 from player.player import User, Dealer
 from player.player import PlayerStatus
+from ui.frame import Frame
 
 class GameManager:
     def __init__(self):
         self.player = None
         self.dealer = None
         self.deck = None
+        self.frame = Frame()
 
     def __create_player(self):
         self.player = User(f"Player 1")
@@ -25,7 +27,12 @@ class GameManager:
         self.__create_dealer()
         self.__create_deck(num_decks)
 
-        self.__next_round()
+        self.frame.draw_frame()
+        self.frame.insert_text(1, 1, "This is a test")
+        self.frame.insert_text(5, 5, "This is another Test")
+        self.frame.draw_frame()
+
+        #self.__next_round()
 
     def display_game_status(self):
         dealer_cards = ""
