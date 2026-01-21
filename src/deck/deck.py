@@ -1,14 +1,13 @@
 import random
 
 from deck.card import Card
-
-SUITS = ["club", "diamond", "heart", "spade"]
-RANKS = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
+from settings.settings import SUITS, RANKS
 
 class Deck:
     def __init__(self):
         self.cards = []
         self.deck_size = 0
+        self.deck_size_init = 0
 
     def shuffle(self) -> Deck:
         random.shuffle(self.cards)
@@ -22,7 +21,12 @@ class Deck:
         for _ in range(num_decks):
             self.__add_cards()
         self.deck_size = len(self.cards)
-        return self        
+        self.deck_size_init = self.deck_size
+        return self
+
+    def draw(self) -> Card:
+        self.deck_size -= 1
+        return self.cards.pop(-1)
 
     def __add_cards(self):
         cards = []
