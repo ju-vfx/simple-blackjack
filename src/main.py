@@ -1,5 +1,7 @@
+from gamemanager.gamemanager import GameManager
+
 def main():
-    print("Hello from simple-blackjack!")
+    game_manager = GameManager()
 
 
 if __name__ == "__main__":
