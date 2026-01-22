@@ -7,7 +7,7 @@ It is as the name suggests a very simple implementation of Blackjack running in 
 - Getting Cards
 - Standing down
 
-To run it just clone the repo and run the main.py file. It is written with Python 3.
+To run it just clone the repo and run `python3 src/main.py`
 
 ![image](screenshot_01.png)
 ![image](screenshot_02.png)
