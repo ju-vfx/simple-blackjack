@@ -15,10 +15,11 @@ class PlayerAction(Enum):
     STAND = 1
 
 class Player:
-    def __init__(self, name: str):
+    def __init__(self, name: str, gamemanager):
         self.name = name
         self.hand = []
         self.status = PlayerStatus.PLAYING
+        self.gamemanager = gamemanager
 
     def draw_card(self, deck: Deck):
         card = deck.draw()
@@ -47,32 +48,24 @@ class Player:
     def play_turn(self, deck: Deck):
         raise NotImplementedError("play_turn not implemented")
     
-    def bust(self):
-        raise NotImplementedError("bust not implemented")
-
-    def win(self):
-        raise NotImplementedError("win not implemented")
 
 class Dealer(Player):
-    def __init__(self, name: str):
-        super().__init__(name)
+    def __init__(self, name: str, gamemanager):
+        super().__init__(name, gamemanager)
         
     def play_turn(self, deck: Deck):
         if self.status == PlayerStatus.PLAYING: 
             if self.hand_value() <= 16:
                 self.draw_card(deck)
                 if self.hand_value() > 21:
-                    self.bust()
+                    self.status = PlayerStatus.BUST
             else:
                 self.status = PlayerStatus.STAND
-
-    def bust(self):
-        self.status = PlayerStatus.BUST
             
 
 class User(Player):
-    def __init__(self, name: str):
-        super().__init__(name)
+    def __init__(self, name: str, gamemanager):
+        super().__init__(name, gamemanager)
         self.credits = PLAYER_START_CREDITS
         self.bet = 0
 
@@ -81,15 +74,48 @@ class User(Player):
 
     def subtract_credits(self, amount: int):
         self.credits -= amount
-        self.bet = 0
         if self.credits <= 0:
             self.status = PlayerStatus.GAMEOVER
-        else:
-            self.status = PlayerStatus.BUST
 
     def place_bet(self):
-        bet = input(f"Credits: {self.credits}\nHow many credits to bet?\n")
-        self.bet = int(bet)
+        text = f"Credits: {str(self.credits):<19}\nHow many do you want to bet?"
+        self.gamemanager.frame.store_frame()
+        self.gamemanager.frame.insert_element(30, 15, text)
+        self.gamemanager.frame.draw_frame()
+        # Check valid input
+        while True:
+            try:
+                bet = int(input())
+                if bet and bet <= self.credits:
+                    self.bet = bet
+                    break
+            except:
+                self.gamemanager.frame.insert_element(1, 28, "Please insert valid bet!")
+                self.gamemanager.frame.draw_frame()
+
+        self.gamemanager.frame.restore_frame()
+        self.gamemanager.frame.draw_frame()
+
+    def select_action(self) -> PlayerAction:
+        text = f"1) Hit  \n2) Stand"
+        self.gamemanager.frame.store_frame()
+        self.gamemanager.frame.insert_element(10, 25, text)
+        self.gamemanager.frame.draw_frame()
+        action = None
+        while True:
+            try:
+                action = int(input()) - 1
+                print(f"Action: {action}")
+                if action in PlayerAction:
+                    action = PlayerAction(action)
+                    break
+            except:
+                self.gamemanager.frame.insert_element(1, 28, "Please select valid action!")
+                self.gamemanager.frame.draw_frame()
+        
+        self.gamemanager.frame.restore_frame()
+        self.gamemanager.frame.draw_frame()
+        return action
 
     def play_turn(self, deck: Deck):
         # First round
@@ -97,27 +123,14 @@ class User(Player):
             self.place_bet()
             self.draw_card(deck)
             self.draw_card(deck)
-            if self.hand_value() > 21:
-                self.bust()
             return
         # Normal round
-        action = input("0) Hit\n1) Stand\n")
-        action = PlayerAction(int(action))
+        action = self.select_action()
         match action:
             case PlayerAction.STAND:
                 self.status = PlayerStatus.STAND
             case PlayerAction.HIT:
                 self.draw_card(deck)
                 if self.hand_value() > 21:
-                    self.bust()
-
-    def bust(self):
-        self.subtract_credits(self.bet)
-
-    def win(self):
-        self.add_credits(self.bet * 2)
-        self.bet = 0
-        
-
-        
+                    self.status = PlayerStatus.BUST
         

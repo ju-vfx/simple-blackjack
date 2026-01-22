@@ -5,9 +5,11 @@ class Frame:
     def __init__(self):
         self.width = UI_WIDTH
         self.height = UI_HEIGHT
-        self.frame = self.clear_frame()
+        self.frame = None
+        self.clear_frame()
+        self.prev_frame = self.frame
 
-    def clear_frame(self) -> list[list[str]]:
+    def clear_frame(self):
         frame = []
         for r in range(self.height):
             row = []
@@ -24,7 +26,13 @@ class Frame:
                 else:
                     row.append(" ")
             frame.append(row)
-        return frame
+        self.frame = frame
+    
+    def store_frame(self):
+        self.prev_frame = self.frame
+
+    def restore_frame(self):
+        self.frame = self.prev_frame
     
     def draw_frame(self):
         os.system('clear')
@@ -36,9 +44,14 @@ class Frame:
                 frame_string += "\n"
         print(frame_string)
 
-    def insert_drawable(self, x: int = 0, y: int = 0, width: int = 0, height: int = 0, drawable: list[list] = None):
-        pass
 
-    def insert_text(self, x: int = 0, y: int = 0, text: str = None):
-        for col in range(len(text)):
-            self.frame[y][col + x] = text[col]
+    def insert_element(self, x: int = 0, y: int = 0, text: str = None):
+        lines = text.splitlines()
+        lines = [x for x in lines if x != ""] # Remove whitespace
+        width = len(lines[0])
+        height = len(lines)
+        print(lines)
+
+        for row in range(height):
+            for col in range(width):
+                self.frame[row + y][col + x] = lines[row][col]
