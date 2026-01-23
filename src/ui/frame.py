@@ -47,11 +47,14 @@ class Frame:
 
     def insert_element(self, x: int = 0, y: int = 0, text: str = None):
         lines = text.splitlines()
-        lines = [x for x in lines if x != ""] # Remove whitespace
-        width = len(lines[0])
+        if lines[0] == "":
+            del lines[0]
+        width = max([len(line) for line in lines])
         height = len(lines)
-        print(lines)
+        lines = [f"{line: <{width}}" for line in lines]
 
         for row in range(height):
             for col in range(width):
+                if row + y >= self.height or row + y < 0 or col + x >= self.width or col + x < 0:
+                    continue
                 self.frame[row + y][col + x] = lines[row][col]

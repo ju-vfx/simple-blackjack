@@ -78,39 +78,58 @@ class User(Player):
             self.status = PlayerStatus.GAMEOVER
 
     def place_bet(self):
-        text = f"Credits: {str(self.credits):<19}\nHow many do you want to bet?"
+        text = f"""
+X-----------------------------------X
+| CURRENT CREDITS: {str(self.credits): <17}|
+|                                   |
+| How many do you want to bet?      |
+|                                   |
+|                                   |
+X-----------------------------------X
+"""
         self.gamemanager.frame.store_frame()
-        self.gamemanager.frame.insert_element(30, 15, text)
+        self.gamemanager.frame.insert_element(2, 22, text)
         self.gamemanager.frame.draw_frame()
         # Check valid input
         while True:
             try:
                 bet = int(input())
-                if bet and bet <= self.credits:
+                if bet <= self.credits and bet > 0:
                     self.bet = bet
                     break
+                else:
+                    raise Exception
             except:
-                self.gamemanager.frame.insert_element(1, 28, "Please insert valid bet!")
+                self.gamemanager.frame.insert_element(4, 27, "Please insert valid bet!")
                 self.gamemanager.frame.draw_frame()
 
         self.gamemanager.frame.restore_frame()
         self.gamemanager.frame.draw_frame()
 
     def select_action(self) -> PlayerAction:
-        text = f"1) Hit  \n2) Stand"
+        text = f"""
+X-----------------------------------X
+| ACTIONS:                          |
+|                                   |
+| 1) Hit                            |
+| 2) Stand                          |
+|                                   |
+X-----------------------------------X
+"""
         self.gamemanager.frame.store_frame()
-        self.gamemanager.frame.insert_element(10, 25, text)
+        self.gamemanager.frame.insert_element(2, 22, text)
         self.gamemanager.frame.draw_frame()
         action = None
         while True:
             try:
                 action = int(input()) - 1
-                print(f"Action: {action}")
                 if action in PlayerAction:
                     action = PlayerAction(action)
                     break
+                else:
+                    raise Exception
             except:
-                self.gamemanager.frame.insert_element(1, 28, "Please select valid action!")
+                self.gamemanager.frame.insert_element(4, 27, "Please select valid action!")
                 self.gamemanager.frame.draw_frame()
         
         self.gamemanager.frame.restore_frame()
